@@ -24,7 +24,7 @@ def signup():
         user = user_schema.load(user_details)
         user.save()
     except ValidationError as e:
-        return { "errors": e.messages, "messages": "Something went wrong..."}
+        return { "errors": e.messages, "messages": "Something went wrong..."}, HTTPStatus.BAD_REQUEST
     return user_schema.jsonify(user)
 
 @router.route('/login', methods=['POST'])
@@ -37,5 +37,4 @@ def login():
         return { "message": "Your email or password was incorrect." }, HTTPStatus.UNAUTHORIZED
 
     token = user.generate_token()
-
-    return { "token": token, "message": "Welcome back!" }
+    return { "token": token, "message": "Welcome back!" }, HTTPStatus.CONTINUE
