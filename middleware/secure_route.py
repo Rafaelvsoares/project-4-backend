@@ -3,7 +3,7 @@ from functools import wraps
 from flask import request, g
 import jwt
 from config.environment import secret
-from models.user import UserModel
+from models.users import UserModel
 
 def secure_route(func):
     @wraps(func)

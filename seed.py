@@ -1,10 +1,11 @@
 from app import app, db
-from models.product import ProductModel
-from models.comment import CommentModel
-from models.product_data import products
-from models.user import UserModel
-from models.basket import BasketModel
-from models.basket_item import BasketItemModel
+from data.products_data import products_list
+from data.categories_data import categories_list
+from data.users_data import users_list
+from data.comments_data import comments_list
+from data.images_data import images_list
+from data.baskets_data import baskets_list
+from data.basket_item_data import basket_item_list
 
 with app.app_context():
     try:
@@ -13,32 +14,28 @@ with app.app_context():
         db.create_all()
 
         print('Seeding the database!')
-        for dictionary in products:
-            product = ProductModel(**dictionary)
-            product.save()
 
-            comment = CommentModel(content=f'This is a comment of product id: {product.id}', product_id=product.id)
-            comment.save()
-            
-        ##! Raf
-        user_raf = UserModel(username="Rafael", password="Rafael123", email="raf@mail.com")
-        user_raf.save()
-        basket_raf = BasketModel(user_id=user_raf.id)
-        basket_raf.save()
-        basket_product1 = BasketItemModel(quantity=3, basket_id=basket_raf.id, product_id=6)
-        basket_product1.save()
-        basket_product2 = BasketItemModel(quantity=2, basket_id=basket_raf.id, product_id=1)
-        basket_product2.save()
-        
+        db.session.add_all(categories_list)
+        db.session.commit()
 
-        ##! Fabio
-        user_fab = UserModel(username="Fabio", password="Fabio123", email="fabio@mail.com")
-        user_fab.save()
-        basket_fab = BasketModel(user_id=user_fab.id)
-        basket_fab.save()
-        basket_product3 = BasketItemModel(quantity=2, basket_id=basket_fab.id, product_id=5)
-        basket_product3.save()
-        
+        db.session.add_all(users_list)
+        db.session.commit()
+
+        db.session.add_all(baskets_list)
+        db.session.commit()
+
+        db.session.add_all(products_list)
+        db.session.commit()
+
+        db.session.add_all(basket_item_list)
+        db.session.commit
+
+        db.session.add_all(comments_list)
+        db.session.commit()
+
+        db.session.add_all(images_list)
+        db.session.commit()
+
 
         print('Database seeded!')
     except Exception as e:

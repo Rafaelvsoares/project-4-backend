@@ -1,10 +1,10 @@
 
 from flask import Blueprint, request
 from marshmallow.exceptions import ValidationError
-from models.product import ProductModel
-from serializers.product import ProductSchema
-from serializers.comment import CommentSchema
-from models.comment import CommentModel 
+from models.products import ProductModel
+from serializers.products import ProductSchema
+from serializers.comments import CommentSchema
+from models.comments import CommentModel 
 
 comment_schema = CommentSchema()
 store_schema = ProductSchema()
