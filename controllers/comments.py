@@ -1,10 +1,11 @@
 
-from flask import Blueprint, request
+from flask import Blueprint, request, g
 from marshmallow.exceptions import ValidationError
 from models.products import ProductModel
 from serializers.products import ProductSchema
 from serializers.comments import CommentSchema
 from models.comments import CommentModel
+from middleware.secure_route import secure_route
 from http import HTTPStatus
 
 comment_schema = CommentSchema()
@@ -40,6 +41,7 @@ def post_comment(productId):
 
 # ! Update comment (PUT)
 @router.route("/products/comments/<int:commentId>", methods=["PUT"])
+@secure_route
 def update_comment(commentId):
     comment_req = request.json
     comment = CommentModel.query.get(commentId)
@@ -53,3 +55,16 @@ def update_comment(commentId):
     return comment_schema.jsonify(comment)
 
 # ! Delete comment (DELETE)
+@router.route('/products/comments/<int:commentId>', methods=["DELETE"])
+@secure_route
+def delete_comment(commentId):
+    comment = CommentModel.query.get(commentId)
+    try:
+        if not comment:
+            return {"message": "Comment not found"}, HTTPStatus.NOT_FOUND
+        if comment.user_id != g.current_user.id:
+            return {"message": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
+        comment.delete()
+    except ValidationError as e:
+        return {"errors": e.messages, "messages": "Something went wrong"}
+    return {"message": "Comment deleted"}, HTTPStatus.OK

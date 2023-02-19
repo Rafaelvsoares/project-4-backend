@@ -29,12 +29,18 @@ def signup():
 
 @router.route('/login', methods=['POST'])
 def login():
-    user_details = request.json
-    user = UserModel.query.filter_by(email=user_details["email"]).first()
-    if not user:
-        return { "message": "Your email or password was incorrect." }, HTTPStatus.UNAUTHORIZED
-    if not user.validate_password(user_details["password"]):
-        return { "message": "Your email or password was incorrect." }, HTTPStatus.UNAUTHORIZED
+    try:
+        user_details = request.json
+        user = UserModel.query.filter_by(email=user_details["email"]).first()
 
-    token = user.generate_token()
-    return { "token": token, "message": "Welcome back!" }, HTTPStatus.CONTINUE
+        if not user:
+            return { "message": "Your email or password was incorrect." }, HTTPStatus.UNAUTHORIZED
+        
+        if not user.validate_password(user_details["password"]):
+            return { "message": "Your email or password was incorrect." }, HTTPStatus.UNAUTHORIZED
+        
+        token = user.generate_token()
+        return { "token": token, "message": f"Welcome back {user.username}!" }, HTTPStatus.OK
+    
+    except Exception as e:
+        return {"messages": "Something went wrong"}
