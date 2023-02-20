@@ -4,7 +4,7 @@ from models.products import ProductModel
 from serializers.comments import CommentSchema
 
 
-class ProductSchema(ma.SQLAlchemyAutoSchema):
+class Product_CommentSchema(ma.SQLAlchemyAutoSchema):
     comments = fields.Nested('CommentSchema', many=True)
     class Meta:
         include_fk = True

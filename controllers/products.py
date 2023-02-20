@@ -1,11 +1,11 @@
 from flask import Blueprint, request, g
 from marshmallow.exceptions import ValidationError
 from models.products import ProductModel
-from serializers.products import ProductSchema
+from serializers.products import Product_CommentSchema
 from middleware.secure_route import secure_route
 from http import HTTPStatus
 
-product_schema = ProductSchema()
+product_schema = Product_CommentSchema()
 router = Blueprint('products', __name__)
 
 ## ! Get all products (GET)

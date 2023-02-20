@@ -2,14 +2,12 @@
 from flask import Blueprint, request, g
 from marshmallow.exceptions import ValidationError
 from models.products import ProductModel
-from serializers.products import ProductSchema
 from serializers.comments import CommentSchema
 from models.comments import CommentModel
 from middleware.secure_route import secure_route
 from http import HTTPStatus
 
 comment_schema = CommentSchema()
-store_schema = ProductSchema()
 router = Blueprint("comments", __name__)
 
 # ! Get all comments
@@ -26,14 +24,16 @@ def get_related_comments(productId):
 
 # ! Post product by ID (POST)
 @router.route("/products/<int:productId>/comments", methods=["POST"])
+@secure_route
 def post_comment(productId):
     check_product = ProductModel.query.get(productId)
     if not check_product:
         return { "message": "The ID provided doesn't exist..." }, HTTPStatus.NOT_FOUND
     try:
-        comment_req = request.json
-        comment = comment_schema.load(comment_req)
-        comment.product_id = productId
+        comment_dict = request.json
+        comment_dict["user_id"] = g.current_user.id
+        comment_dict["product_id"] = productId
+        comment = comment_schema.load(comment_dict)
         comment.save()
     except ValidationError as e:
         return { "errors" : e.messages, "message": "Something went wrong" }, HTTPStatus.BAD_REQUEST
@@ -45,9 +45,12 @@ def post_comment(productId):
 def update_comment(commentId):
     comment_req = request.json
     comment = CommentModel.query.get(commentId)
-    if not comment:
-        return { "message": "Comment ID not found..." }, HTTPStatus.NOT_FOUND
     try:
+        if not comment:
+            return { "message": "Comment ID not found..." }, HTTPStatus.NOT_FOUND
+        if comment.user_id != g.current_user.id:
+            return {"message": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
+        
         updated_comment = comment_schema.load(comment_req, instance=comment, partial=True)
         updated_comment.save()
     except ValidationError as e:
