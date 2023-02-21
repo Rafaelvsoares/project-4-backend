@@ -25,6 +25,9 @@ def get_single_product(product_id):
 @secure_route
 def add_product():
     product_dict = request.json
+    if not 'image_url' in product_dict:
+        return { "message": "image_url must be in the request                                                                                                                     " }, HTTPStatus.UNAUTHORIZED
+
     try:
         product_dict["user_id"] = g.current_user.id
         product = product_schema.load(product_dict)
