@@ -2,10 +2,12 @@ from flask import Blueprint, request, g
 from marshmallow.exceptions import ValidationError
 from models.products import ProductModel
 from serializers.products import Product_CommentSchema
+from serializers.images import ImageSchema
 from middleware.secure_route import secure_route
 from http import HTTPStatus
 
 product_schema = Product_CommentSchema()
+image_schema = ImageSchema()
 router = Blueprint('products', __name__)
 
 ## ! Get all products (GET)
@@ -25,13 +27,26 @@ def get_single_product(product_id):
 @secure_route
 def add_product():
     product_dict = request.json
-    if not 'image_url' in product_dict:
-        return { "message": "image_url must be in the request                                                                                                                     " }, HTTPStatus.UNAUTHORIZED
+    images = request.json.get('images')
+    
+    if not images or len(images) == 0:
+        return { "message": "Product must have at least one image." }, HTTPStatus.BAD_REQUEST
+    
+    if not all(isinstance(image, str) for image in images):
+        return {'message': 'Invalid image paths provided'}, HTTPStatus.BAD_REQUEST
+    
+    del product_dict['images']
 
     try:
         product_dict["user_id"] = g.current_user.id
         product = product_schema.load(product_dict)
         product.save()
+
+        for image in images:
+            image = image_schema.load({"image_url" :image, "product_id": product.id})
+            image.save()
+
+
     except ValidationError as e:
         return { "errors" : e.messages, "message": "Something went wrong" }, HTTPStatus.BAD_REQUEST
     return product_schema.jsonify(product), HTTPStatus.CREATED

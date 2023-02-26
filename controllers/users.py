@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from flask import Blueprint, request
+from flask import Blueprint, request, g
 from marshmallow.exceptions import ValidationError
 from models.users import UserModel
 from serializers.users import UserSchema
@@ -9,6 +9,12 @@ from middleware.secure_route import secure_route
 user_schema = UserSchema()
 
 router = Blueprint('users', __name__)
+
+@router.route('/user', methods=['GET'])
+@secure_route
+def get_user():
+    user = UserModel.query.get(g.current_user.id)
+    return user_schema.jsonify(user)
 
 @router.route('/users', methods=['GET'])
 @secure_route

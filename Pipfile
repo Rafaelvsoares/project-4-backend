@@ -12,6 +12,9 @@ marshmallow-sqlalchemy = "*"
 flask-bcrypt = "*"
 pyjwt = "*"
 sqlalchemy = "==2.0.1"
+python-dotenv = "*"
+flask-cors = "*"
+gunicorn = "*"
 
 [dev-packages]
 pylint = "*"

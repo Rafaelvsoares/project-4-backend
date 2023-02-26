@@ -11,7 +11,7 @@ class ProductModel(db.Model, BaseModel):
 
     title = db.Column(db.Text, nullable=False, unique=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
-    polygons = db.Column(db.Text, nullable=False)
+    polygons = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=False)
 
     #! foreign keys
