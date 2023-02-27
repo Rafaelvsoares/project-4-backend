@@ -10,7 +10,7 @@ class ProductModel(db.Model, BaseModel):
     __tablename__ = "products"
 
     title = db.Column(db.Text, nullable=False, unique=True)
-    price = db.Column(db.Numeric(10, 2), nullable=False)
+    price = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
     polygons = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=False)
 
@@ -20,8 +20,8 @@ class ProductModel(db.Model, BaseModel):
 
     #! relationships
     #? one to many
-    comments = db.relationship('CommentModel', back_populates='products')
-    images = db.relationship('ImageModel', back_populates='products')
+    comments = db.relationship('CommentModel', back_populates='products', cascade="all, delete")
+    images = db.relationship('ImageModel', back_populates='products', cascade="all, delete")
     
     #? many to one
     users = db.relationship('UserModel', back_populates='products')

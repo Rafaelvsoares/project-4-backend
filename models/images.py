@@ -6,7 +6,7 @@ class ImageModel(db.Model, BaseModel):
     image_url = db.Column(db.Text, nullable=False)
 
     #! foreign keys
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False, unique=False)
 
     #! relationships
     #? many to one

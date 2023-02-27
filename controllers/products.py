@@ -2,11 +2,13 @@ from flask import Blueprint, request, g
 from marshmallow.exceptions import ValidationError
 from models.products import ProductModel
 from serializers.products import Product_CommentSchema
+from serializers.basket.products import ProductSchema
 from serializers.images import ImageSchema
 from middleware.secure_route import secure_route
 from http import HTTPStatus
 
 product_schema = Product_CommentSchema()
+simplified_product_schema = ProductSchema()
 image_schema = ImageSchema()
 router = Blueprint('products', __name__)
 
@@ -21,6 +23,15 @@ def get_products():
 def get_single_product(product_id):
     product = ProductModel.query.get(product_id)
     return product_schema.jsonify(product)
+
+## ! Get user products (GET)
+@router.route('/products/user', methods=['GET'])
+@secure_route
+def get_user_products():
+    user_products = ProductModel.query.filter_by(user_id = g.current_user.id)
+    if not user_products:
+        return { 'message': 'No products yet' }, HTTPStatus.NOT_FOUND
+    return simplified_product_schema.jsonify(user_products, many=True)
 
 ## ! Add new product (POST)
 @router.route("/products", methods=["POST"])
